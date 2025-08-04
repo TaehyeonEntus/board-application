@@ -44,13 +44,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         Cookie[] cookies = request.getCookies();
         String accessToken = null;
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("accessToken".equals(cookie.getName())) {
+        if (cookies != null)
+            for (Cookie cookie : cookies)
+                if ("access_token".equals(cookie.getName()))
                     accessToken = cookie.getValue();
-                }
-            }
-        }
+
 
         //잘못된 헤더를 보낸 사용자는 security context에 등록되지 않음, public API만 접근 가능
         if (accessToken == null || accessToken.isEmpty()) {

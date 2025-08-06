@@ -32,8 +32,8 @@ class CommentTest {
         Post post = Post.createPost(user,"Title","Content");
 
         //when
-        Comment comment1 = Comment.addComment(reply,user,post);
-        Comment comment2 = Comment.addComment(reply,user,post);
+        Comment comment1 = Comment.addComment(user,reply,post);
+        Comment comment2 = Comment.addComment(user,reply,post);
 
         //then
         assertNotSame(comment1, comment2);
@@ -48,8 +48,8 @@ class CommentTest {
         Post post = Post.createPost(user,"Title","Content");
 
         //when
-        Comment comment1 = Comment.addComment(reply,user,post);
-        Comment comment2 = Comment.addComment(reply,user,post);
+        Comment comment1 = Comment.addComment(user,reply,post);
+        Comment comment2 = Comment.addComment(user,reply,post);
 
         commentRepository.save(comment1);
         commentRepository.save(comment2);

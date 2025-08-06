@@ -31,4 +31,13 @@ public class User extends BaseEntity{
     public static User createUser(Long userId){
         return new User(userId);
     }
+
+    //<-- 편의 메서드 -->
+    public void addPost(Post post){
+        posts.add(post);
+    }
+
+    public void addComment(Comment comment){
+        comments.add(comment);
+    }
 }

@@ -25,6 +25,10 @@ public class Post extends BaseEntity {
 
     private String content;
 
+    private Integer view;
+
+    private Integer like;
+
     @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
 
@@ -32,10 +36,14 @@ public class Post extends BaseEntity {
         this.author = author;
         this.title = title;
         this.content = content;
+        this.view = 0;
+        this.like = 0;
     }
 
     //<-- 생성 메서드 -->
     public static Post createPost(User author, String title, String content) {
-        return new Post(author, title, content);
+        Post post = new Post(author, title, content);
+        author.addPost(post);
+        return post;
     }
 }

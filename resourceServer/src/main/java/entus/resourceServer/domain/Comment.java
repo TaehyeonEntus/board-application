@@ -16,6 +16,8 @@ public class Comment extends BaseEntity{
 
     private String content;
 
+    private Integer like;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User author;
@@ -28,10 +30,13 @@ public class Comment extends BaseEntity{
         this.content = content;
         this.author = author;
         this.post = post;
+        this.like = 0;
     }
 
     //<-- 생성 메서드 -->
-    public static Comment addComment(String content, User author, Post post){
-        return new Comment(content, author, post);
+    public static Comment addComment(User author, String content , Post post){
+        Comment comment = new Comment(content, author, post);
+        author.addComment(comment);
+        return comment;
     }
 }

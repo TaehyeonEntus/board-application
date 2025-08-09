@@ -1,4 +1,5 @@
 async function loadProtectedData(endpoint) {
+    const AUTH_SERVER_URL = "http://localhost:9000"
     try {
         const res = await fetch(endpoint, {
             method: "GET",
@@ -10,7 +11,7 @@ async function loadProtectedData(endpoint) {
             const errorData = await res.json();
 
             if (errorData.error === "access_token_error") {
-                const refreshRes = await fetch("/token/refresh", {
+                const refreshRes = await fetch(AUTH_SERVER_URL + "/token/refresh", {
                     method: "POST",
                     credentials: "include"
                 });
@@ -27,16 +28,16 @@ async function loadProtectedData(endpoint) {
                     }
                     //access 재시도 실패
                     else {
-                        window.location.href = "http://localhost:9000/login";
+                        window.location.href = AUTH_SERVER_URL + "/login";
                     }
                 }
                 //refresh 실패
                 else {
-                    window.location.href = "http://localhost:9000/login";
+                    window.location.href = AUTH_SERVER_URL + "/login";
                 }
 
             } else if (errorData.error === "refresh_token_error") {
-                window.location.href = "http://localhost:9000/login";
+                window.location.href = AUTH_SERVER_URL + "/login";
             } else {
                 console.error("Unauthorized access");
             }

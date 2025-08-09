@@ -25,10 +25,11 @@ public class MainController {
     @GetMapping("/board")
     public String board(@RequestParam(defaultValue = "0") int page, Model model) {
         List<Post> hots = postService.getTop5Posts();
-        Page<Post> posts = postService.getAll(PageRequest.of(page, 20, Sort.by("created_at").descending()));
+        Page<Post> posts = postService.getAll(PageRequest.of(page,20,Sort.by("id").descending()));
 
         model.addAttribute("hots", hots);
         model.addAttribute("posts", posts);
+
         return "board";
     }
 }

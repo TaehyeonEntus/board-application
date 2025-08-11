@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>게시글 작성</title>
+    <style>
+        form {
+            width: 600px;
+            margin: 0 auto;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        textarea {
+            height: 200px;
+            resize: vertical;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .cancel-button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>게시글 작성</h1>
+
+<form th:action="@{/board/add}" method="post">
+    <label for="title">제목</label>
+    <input type="text" id="title" name="title" required />
+
+    <label for="content">내용</label>
+    <textarea id="content" name="content" required></textarea>
+
+    <button type="submit">작성 완료</button>
+    <a href="/board"><button type="button" class="cancel-button">취소</button></a>
+</form>
+
+<script type="module">
+    import { loadProtectedData } from "/static/js/apiRequest.js";
+
+    window.addEventListener("DOMContentLoaded", () => {
+        loadProtectedData("/addPost", "result");
+    });
+</script>
+</body>
+</html>

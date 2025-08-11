@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html lang="en">
 <head>
     <meta charset="UTF-8" />
     <title>User Page</title>
+    <script type="module" src="/js/apiRequest.js"></script>
 </head>
 <body>
 <h1>User Page</h1>
-<div id="result">Loading...</div>
 
 <script type="module">
-    import { loadProtectedData } from "/js/auth.js";
+    import { loadProtectedData } from "/js/apiRequest.js";
     window.addEventListener("DOMContentLoaded", () => {
         loadProtectedData("/user", "result");
     });

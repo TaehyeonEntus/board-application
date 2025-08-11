@@ -1,41 +1,22 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <title>게시판</title>
     <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: center;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        .write-button {
-            margin-top: 20px;
-        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        th { background-color: #f2f2f2; }
+        .write-button { margin-top: 20px; }
     </style>
 </head>
 <body>
 
 <h1>게시판</h1>
 
-<!-- 🔥 인기글 TOP 5 -->
+<!-- 🔥 인기 게시글 TOP 5 -->
 <h2>🔥 인기 게시글 TOP 5</h2>
-<ul>
-    <li th:each="post : ${hots}">
-        <a th:href="@{'/board/' + ${post.id}}"
-           th:text="${post.title} + ' (조회수: ' + ${post.view} + ')'"></a>
-    </li>
-</ul>
+<ul id="hot-posts"></ul>
 
 <hr>
 
@@ -50,25 +31,72 @@
         <th>조회수</th>
     </tr>
     </thead>
-    <tbody>
-    <tr th:each="post : ${posts}">
-        <td th:text="${post.id}"></td>
-        <td>
-            <a th:href="@{'/board/' + ${post.id}}" th:text="${post.title}"></a>
-        </td>
-        <td th:text="${post.author}"></td>
-        <td th:text="${#temporals.format(post.created_at, 'yyyy-MM-dd')}"></td>
-        <td th:text="${post.view}"></td>
-    </tr>
-    </tbody>
+    <tbody id="post-list"></tbody>
 </table>
 
 <script type="module">
-    import {loadProtectedData} from "/js/auth.js";
+    import { loadProtectedData } from "/js/apiRequest.js";
 
-    window.addEventListener("DOMContentLoaded", () => {
-        loadProtectedData("/board", "result");
+    window.addEventListener("DOMContentLoaded", async () => {
+        const data = await loadProtectedData("/api/board");
+
+        if (!data) {
+            console.error("게시판 데이터를 불러오지 못했습니다.");
+            return;
+        }
+
+        renderHotPosts(data.hotPosts || []);
+        renderPosts(data.posts || []);
     });
+
+    /** 🔹 인기글 렌더링 */
+    function renderHotPosts(hotPosts) {
+        const ul = document.getElementById("hot-posts");
+        ul.innerHTML = "";
+
+        hotPosts.forEach(post => {
+            const li = document.createElement("li");
+            const a = document.createElement("a");
+            a.href = `/board/${post.postId}`;
+            a.textContent = `${post.title} (조회수: ${post.viewCount})`;
+            li.appendChild(a);
+            ul.appendChild(li);
+        });
+    }
+
+    /** 🔹 게시글 목록 렌더링 */
+    function renderPosts(posts) {
+        const tbody = document.getElementById("post-list");
+        tbody.innerHTML = "";
+
+        posts.forEach(post => {
+            const created = post.createdAt
+                ? new Date(post.createdAt).toLocaleDateString()
+                : "-";
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                    <td>${post.postId}</td>
+                    <td><a href="/board/${post.postId}">${escapeHtml(post.title)}</a></td>
+                    <td>${escapeHtml(post.authorName || "-")}</td>
+                    <td>${created}</td>
+                    <td>${post.viewCount ?? 0}</td>
+                `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    /** 🔹 XSS 방지용 HTML 이스케이프 */
+    function escapeHtml(text) {
+        if (!text) return "";
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
 </script>
+
 </body>
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html lang="en">
 <head>
     <meta charset="UTF-8" />
     <title>Admin Page</title>
@@ -9,7 +9,7 @@
 <div id="result">Loading...</div>
 
 <script type="module">
-    import { loadProtectedData } from "/js/auth.js";
+    import { loadProtectedData } from "/js/apiRequest.js";
     window.addEventListener("DOMContentLoaded", () => {
         loadProtectedData("/admin", "result");
     });

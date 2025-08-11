@@ -17,6 +17,8 @@ public class User extends BaseEntity{
     @Column(name="user_id")
     private Long id;
 
+    private String name;
+
     @OneToMany(mappedBy = "author")
     private List<Post> posts = new ArrayList<>();
 
@@ -25,6 +27,7 @@ public class User extends BaseEntity{
 
     protected User(Long id) {
         this.id = id;
+        this.name = "default";
     }
 
     //<-- 생성 메서드 -->

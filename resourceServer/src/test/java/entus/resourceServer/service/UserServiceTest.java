@@ -9,11 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@Transactional
 class UserServiceTest {
     @Autowired
     UserService userService;
@@ -42,38 +41,42 @@ class UserServiceTest {
 
     @Test
     @DisplayName("Get")
-    @Transactional
     void Get() throws Exception {
         //given
-        Long userId = 1L;
+        Long user1Id = 1L;
+        Long user2Id = 2L;
 
         //when
-        User user1 = userService.get(userId);
-        User user2 = userService.get(userId);
+        User user1 = User.createUser(user1Id);
+        User user2 = User.createUser(user2Id);
+
+        userService.add(user1);
+        userService.add(user2);
+
+        User savedUser1 = userService.get(user1Id);
+        User savedUser2 = userService.get(user2Id);
 
         //then
-        assertSame(user1, user2);
+        assertEquals(user1Id, savedUser1.getId());
+        assertEquals(user2Id, savedUser2.getId());
     }
 
     @Test
     @DisplayName("GetAll")
     void GetAll() throws Exception {
         //given
-        int totalUser = 1;
-        //when
-        List<User> users = userService.getAll();
-        //then
-        assertEquals(totalUser, users.size());
-    }
-
-    @Test
-    @DisplayName("SyncUser")
-    void SyncUser() throws Exception {
-        //given
+        Long user1Id = 1L;
+        Long user2Id = 2L;
 
         //when
+        User user1 = User.createUser(user1Id);
+        User user2 = User.createUser(user2Id);
+
+        userService.add(user1);
+        userService.add(user2);
 
         //then
-
+        assertEquals(userService.getAll().size(),2);
     }
+
 }

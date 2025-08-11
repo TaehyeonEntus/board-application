@@ -1,5 +1,7 @@
 package entus.resourceServer.config;
 
+import entus.resourceServer.exception.CustomAccessDeniedHandler;
+import entus.resourceServer.exception.CustomAuthenticationEntryPoint;
 import entus.resourceServer.filter.token.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +18,9 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -23,11 +28,14 @@ public class SecurityConfig {
                 .sessionManagement((configurer) -> configurer
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/public", "/","/error").permitAll()
+                        .requestMatchers("/public", "/", "/board", "/board/**", "/error","/favicon.ico","/js/**").permitAll()
+                        .requestMatchers("/user", "/api/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/admin").hasRole("ADMIN")
-                        .requestMatchers("/user","/board").hasRole("USER")
                         .anyRequest().authenticated())
-                .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler));
 
         return http.build();
     }

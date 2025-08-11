@@ -69,9 +69,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         String userId = claimsJws.getPayload().getSubject();
         String role = claimsJws.getPayload().get("role", String.class);
-
         //FE에 제공 하기 위한 정보 (미 사용시 주석 처리)
         //String name = claimsJws.getPayload().get("name", String.class);
+        request.setAttribute("userId", userId);
         //request.setAttribute("name", name);
 
         // 3. 인증 정보 Security Context 등록 (접근 제한용)

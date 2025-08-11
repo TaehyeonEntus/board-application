@@ -13,7 +13,7 @@ public class CommentService {
         return commentRepository.save(comment).getId();
     }
 
-    public Comment find(Long commentId) {
+    public Comment get(Long commentId) {
         return commentRepository.findById(commentId).orElseThrow();
     }
 }

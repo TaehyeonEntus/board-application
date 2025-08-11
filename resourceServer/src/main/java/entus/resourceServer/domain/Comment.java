@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comment extends BaseEntity{
+public class Comment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "comment_id")
@@ -26,7 +26,7 @@ public class Comment extends BaseEntity{
     @JoinColumn(name = "post_id")
     private Post post;
 
-    public Comment(String content, User author, Post post) {
+    protected Comment(String content, User author, Post post) {
         this.content = content;
         this.author = author;
         this.post = post;
@@ -34,7 +34,7 @@ public class Comment extends BaseEntity{
     }
 
     //<-- 생성 메서드 -->
-    public static Comment addComment(User author, String content , Post post){
+    public static Comment createComment(User author, Post post, String content) {
         Comment comment = new Comment(content, author, post);
         author.addComment(comment);
         return comment;

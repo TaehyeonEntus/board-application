@@ -25,15 +25,15 @@ class CommentTest {
 
     @Test
     @DisplayName("AddComment")
-    void AddComment() throws Exception {
+    void createComment() throws Exception {
         //given
         String reply = "reply";
         User user = User.createUser(1L);
         Post post = Post.createPost(user,"Title","Content");
 
         //when
-        Comment comment1 = Comment.addComment(user,reply,post);
-        Comment comment2 = Comment.addComment(user,reply,post);
+        Comment comment1 = Comment.createComment(user,post,reply);
+        Comment comment2 = Comment.createComment(user,post,reply);
 
         //then
         assertNotSame(comment1, comment2);
@@ -48,8 +48,8 @@ class CommentTest {
         Post post = Post.createPost(user,"Title","Content");
 
         //when
-        Comment comment1 = Comment.addComment(user,reply,post);
-        Comment comment2 = Comment.addComment(user,reply,post);
+        Comment comment1 = Comment.createComment(user,post,reply);
+        Comment comment2 = Comment.createComment(user,post,reply);
 
         commentRepository.save(comment1);
         commentRepository.save(comment2);

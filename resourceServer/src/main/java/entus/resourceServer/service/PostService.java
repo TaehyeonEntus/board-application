@@ -24,10 +24,10 @@ public class PostService {
     }
 
     public Page<Post> getPostsByPage(Pageable pageable) {
-        return postRepository.findPostsWithAuthor(pageable);
+        return postRepository.findAll(pageable);
     }
 
     public List<Post> getTop5Posts(){
-        return postRepository.findTop5PostsWithAuthor(PageRequest.of(0,5));
+        return postRepository.findTop5PostsByOrderByIdDesc();
     }
 }

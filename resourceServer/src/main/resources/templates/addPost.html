@@ -33,28 +33,41 @@
         .cancel-button {
             margin-left: 10px;
         }
+        /* 에러 필드 빨간 테두리 */
+        .is-invalid {
+            border-color: red;
+            outline: none;
+        }
+        /* 에러 메시지 스타일 */
+        .error {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 3px;
+        }
     </style>
 </head>
 <body>
 <h1>게시글 작성</h1>
 
-<form th:action="@{/board/add}" method="post">
+<form th:action="@{/board/add}" th:object="${postAddDto}" method="post" novalidate>
     <label for="title">제목</label>
-    <input type="text" id="title" name="title" required />
+    <input type="text" id="title" th:field="*{title}" th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''" />
+    <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="error"></div>
 
     <label for="content">내용</label>
-    <textarea id="content" name="content" required></textarea>
+    <textarea id="content" th:field="*{content}" th:classappend="${#fields.hasErrors('content')} ? 'is-invalid' : ''"></textarea>
+    <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="error"></div>
 
     <button type="submit">작성 완료</button>
     <a href="/board"><button type="button" class="cancel-button">취소</button></a>
 </form>
 
 <script type="module">
-    import { loadProtectedData } from "/static/js/apiRequest.js";
-
+    import { loadProtectedData } from "/js/apiRequest.js";
     window.addEventListener("DOMContentLoaded", () => {
-        loadProtectedData("/addPost", "result");
+        loadProtectedData("/api/board/add");
     });
 </script>
+
 </body>
 </html>

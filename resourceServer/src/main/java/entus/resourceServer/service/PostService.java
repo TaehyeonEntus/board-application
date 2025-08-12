@@ -4,6 +4,7 @@ import entus.resourceServer.domain.Post;
 import entus.resourceServer.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -22,11 +23,11 @@ public class PostService {
         return postRepository.findById(postId).orElseThrow();
     }
 
-    public Page<Post> getAll(Pageable pageable) {
-        return postRepository.findAll(pageable);
+    public Page<Post> getPostsByPage(Pageable pageable) {
+        return postRepository.findPostsWithAuthor(pageable);
     }
 
     public List<Post> getTop5Posts(){
-        return postRepository.findTop5ByOrderByIdDesc();
+        return postRepository.findTop5PostsWithAuthor(PageRequest.of(0,5));
     }
 }

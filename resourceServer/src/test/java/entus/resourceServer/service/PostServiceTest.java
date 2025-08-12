@@ -64,7 +64,7 @@ class PostServiceTest {
 
     @Test
     @DisplayName("GetAll")
-    void GetAll() throws Exception {
+    void GetPostsByPage() throws Exception {
         //given
         User user1 = userService.get(1L);
         User user2 = userService.get(2L);
@@ -73,7 +73,7 @@ class PostServiceTest {
         postService.add(Post.createPost(user2, "title", "content"));
 
         //when
-        Page<Post> posts = postService.getAll(PageRequest.of(0,20));
+        Page<Post> posts = postService.getPostsByPage(PageRequest.of(0,20));
 
         //then
         assertEquals(posts.getTotalElements(), 2);
@@ -89,7 +89,7 @@ class PostServiceTest {
             postService.add(Post.createPost(user, "title", "content"));
 
         //when
-        Page<Post> posts = postService.getAll(PageRequest.of(0, 20));
+        Page<Post> posts = postService.getPostsByPage(PageRequest.of(0, 20));
         List<Post> top5Posts = postService.getTop5Posts();
 
         //then

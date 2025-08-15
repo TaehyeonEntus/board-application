@@ -1,11 +1,10 @@
 package entus.resourceServer.controller;
 
+import entus.resourceServer.domain.Comment;
 import entus.resourceServer.domain.Post;
 import entus.resourceServer.domain.User;
-import entus.resourceServer.domain.dto.BoardResponseDto;
-import entus.resourceServer.domain.dto.PostAddDto;
-import entus.resourceServer.domain.dto.PostDto;
-import entus.resourceServer.domain.dto.PostListDto;
+import entus.resourceServer.domain.dto.*;
+import entus.resourceServer.service.CommentService;
 import entus.resourceServer.service.PostService;
 import entus.resourceServer.service.UserService;
 import jakarta.validation.Valid;
@@ -16,7 +15,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -29,6 +27,7 @@ import java.util.Map;
 public class BoardController {
     private final PostService postService;
     private final UserService userService;
+    private final CommentService commentService;
 
     @GetMapping("/board")
     public String board() {
@@ -37,7 +36,7 @@ public class BoardController {
 
     @ResponseBody
     @GetMapping("/api/board")
-    public BoardResponseDto apiBoard(@RequestParam(defaultValue = "0") int page) {
+    public BoardDto apiBoard(@RequestParam(defaultValue = "0") int page) {
         Page<Post> postsList = postService.getPostsByPage(PageRequest.of(page, 20, Sort.by("id").descending()));
         List<Post> hotPostsList = postService.getTop5Posts();
 
@@ -49,27 +48,48 @@ public class BoardController {
                 .map(PostListDto::new)
                 .toList();
 
-        return new BoardResponseDto(hotPosts, posts);
+        return new BoardDto(hotPosts, posts);
     }
 
 
-
     @GetMapping("/board/{postId}")
-    public String viewPost(@PathVariable String postId) {
+    public String viewPost(@PathVariable String postId, Model model) {
+        postService.addViewCount(Long.parseLong(postId));
+        model.addAttribute("postId", postId);
+        if (!model.containsAttribute("commentAddDto")) {
+            model.addAttribute("commentAddDto", new CommentAddDto());
+        }
         return "viewPost";
     }
 
     @ResponseBody
     @GetMapping("/api/board/{postId}")
-    public PostDto apiBoard(@PathVariable Long postId) {
-        return new PostDto(postService.get(postId));
+    public PostDto apiBoard(@PathVariable Long postId, Principal principal) {
+        return new PostDto(postService.get(postId),Long.parseLong(principal.getName()));
+    }
+
+    @PostMapping("/board/{postId}/addComment")
+    public String addComment(@PathVariable String postId,
+                             @Valid @ModelAttribute CommentAddDto commentAddDto,
+                             BindingResult bindingResult,
+                             Principal principal,
+                             Model model) {
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("commentAddDto", commentAddDto);
+            return "viewPost";
+        }
+
+        User user = userService.get(Long.parseLong(principal.getName()));
+        Post post = postService.get(Long.parseLong(postId));
+        commentService.add(Comment.createComment(user, post, commentAddDto.getComment()));
+
+        return "redirect:/board/" + postId;
     }
 
     @GetMapping("/board/add")
     public String showAddPost(Model model) {
-        System.out.println("model attributes: " + model.asMap());
-
-        if(!model.containsAttribute("postAddDto")) {
+        if (!model.containsAttribute("postAddDto")) {
             model.addAttribute("postAddDto", new PostAddDto());
         }
         return "addPost";
@@ -92,9 +112,6 @@ public class BoardController {
             Model model) {
 
         if (bindingResult.hasErrors()) {
-            for (ObjectError error : bindingResult.getAllErrors()) {
-                System.out.println(error);
-            }
             model.addAttribute("postAddDto", postAddDto);
             return "addPost";
         }
@@ -103,5 +120,25 @@ public class BoardController {
         Long postId = postService.add(Post.createPost(user, postAddDto.getTitle(), postAddDto.getContent()));
 
         return "redirect:/board/" + postId;
+    }
+
+    @PostMapping("/board/post/{postId}/like")
+    @ResponseBody
+    public PostDto likePost(@PathVariable Long postId,
+                           Principal principal) {
+        Long userId = Long.parseLong(principal.getName());
+        Post post = postService.like(postId, userId);
+
+        return new PostDto(post,userId);
+    }
+
+    @PostMapping("/board/comment/{commentId}/like")
+    @ResponseBody
+    public CommentDto likeComment(@PathVariable Long commentId,
+                                  Principal principal) {
+        Long userId = Long.parseLong(principal.getName());
+        Comment comment = commentService.like(commentId, userId);
+
+        return new CommentDto(comment,userId);
     }
 }

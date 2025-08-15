@@ -4,8 +4,8 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class BoardResponseDto {
-    public BoardResponseDto(List<PostListDto> hotPosts, List<PostListDto> posts) {
+public class BoardDto {
+    public BoardDto(List<PostListDto> hotPosts, List<PostListDto> posts) {
         this.hotPosts = hotPosts;
         this.posts = posts;
     }

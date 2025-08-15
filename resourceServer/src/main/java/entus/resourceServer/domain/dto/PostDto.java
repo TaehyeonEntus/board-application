@@ -1,6 +1,5 @@
 package entus.resourceServer.domain.dto;
 
-import entus.resourceServer.domain.Comment;
 import entus.resourceServer.domain.Post;
 import lombok.Data;
 
@@ -22,16 +21,19 @@ public class PostDto {
 
     private Integer likeCount;
 
-    private List<Comment> comments;
+    private List<CommentDto> comments;
 
-    public PostDto(Post post) {
+    private boolean like;
+
+    public PostDto(Post post,Long userId) {
         this.postId = post.getId();
         this.authorId = post.getAuthor().getId();
         this.authorName = post.getAuthor().getName();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.viewCount = post.getViewCount();
-        this.likeCount = post.getLikeCount();
-        this.comments = post.getComments();
+        this.likeCount = post.getPostLikes().size();
+        this.like = post.getPostLikes().stream().anyMatch(pl -> pl.getUser().getId().equals(userId));
+        this.comments = post.getComments().stream().map(comment -> new CommentDto(comment, userId)).toList();
     }
 }

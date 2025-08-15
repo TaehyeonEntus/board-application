@@ -19,5 +19,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @EntityGraph(attributePaths = {"author"})
     List<Post> findTop5PostsWithAuthor(Pageable pageable);*/
 
-    List<Post> findTop5PostsByOrderByIdDesc();
+    List<Post> findTop5PostsByOrderByViewCountDesc();
 }

@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8" />
     <title id="page-title">게시글 상세</title>
-    <!-- 스타일 생략 -->
+    <style>
+        .comment { margin-bottom: 10px; padding: 5px; border-bottom: 1px solid #ddd; }
+        .comment-author { font-weight: bold; }
+        .comment-content { margin: 5px 0; }
+        button { cursor: pointer; }
+    </style>
 </head>
 <body>
 
@@ -16,6 +21,7 @@
 <div class="stats">
     조회수: <span id="post-viewCount">0</span> |
     좋아요: <span id="post-likeCount">0</span>
+    <button id="post-like-btn">❤️ 좋아요</button>
 </div>
 
 <div class="content" id="post-content">
@@ -24,47 +30,61 @@
 
 <hr />
 
+<form th:action="@{'/board/' + ${postId} + '/addComment'}"
+      th:object="${commentAddDto}" method="post">
+    <textarea th:field="*{comment}"></textarea>
+    <div th:if="${#fields.hasErrors('comment')}" th:errors="*{comment}"></div>
+    <button type="submit">등록</button>
+</form>
+
 <div class="comments">
     <h2>댓글 (<span id="comment-count">0</span>)</h2>
-    <div id="comment-list">
-        댓글 로딩 중...
-    </div>
+    <div id="comment-list">댓글 로딩 중...</div>
 </div>
 
 <script type="module">
     import { loadProtectedData } from "/js/apiRequest.js";
 
-    // URL에서 postId를 가져오는 간단한 함수
     function getPostIdFromURL() {
-        const path = window.location.pathname; // 예: /board/123
-        const parts = path.split('/');
+        const parts = window.location.pathname.split('/');
         return parts.length > 2 ? parts[2] : null;
     }
 
-    // XSS 방지용 이스케이프 함수
-    function escapeHtml(text) {
-        if (!text) return "";
-        return text
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+    // 게시글 좋아요
+    async function likePost(postId, btnEl, countEl) {
+        try {
+            const res = await fetch(`/board/post/${postId}/like`, { method: "POST" });
+            if (!res.ok) throw new Error("좋아요 실패");
+            const updated = await res.json(); // PostDto
+            countEl.textContent = updated.likeCount;
+            btnEl.textContent = updated.like ? "❤️ 좋아요 완료" : "❤️ 좋아요";
+        } catch (err) {
+            alert(err.message);
+        }
     }
 
+    // 댓글 좋아요
+    async function likeComment(commentId, btnEl, countEl) {
+        try {
+            const res = await fetch(`/board/comment/${commentId}/like`, { method: "POST" });
+            if (!res.ok) throw new Error("좋아요 실패");
+            const updated = await res.json(); // CommentDto
+            countEl.textContent = updated.likeCount;
+            btnEl.textContent = updated.like ? "❤️ 좋아요 완료" : "❤️ 좋아요";
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
+    // 게시글 + 댓글 렌더링
     async function renderPost() {
         const postId = getPostIdFromURL();
-        if (!postId) {
-            alert("잘못된 게시글 주소입니다.");
-            return;
-        }
+        if (!postId) return;
 
         const post = await loadProtectedData(`/api/board/${postId}`);
-        if (!post) {
-            alert("게시글을 불러오지 못했습니다.");
-            return;
-        }
+        if (!post) return;
 
+        // 게시글
         document.getElementById("page-title").textContent = post.title;
         document.getElementById("post-title").textContent = post.title;
         document.getElementById("post-author").textContent = post.authorName || "-";
@@ -72,8 +92,16 @@
         document.getElementById("post-likeCount").textContent = post.likeCount ?? 0;
         document.getElementById("post-content").textContent = post.content || "";
 
+        // 게시글 좋아요 버튼
+        const postLikeBtn = document.getElementById("post-like-btn");
+        const postLikeCountEl = document.getElementById("post-likeCount");
+        postLikeBtn.textContent = post.like ? "❤️ 좋아요 완료" : "❤️ 좋아요";
+        postLikeBtn.addEventListener("click", () => likePost(postId, postLikeBtn, postLikeCountEl));
+
+        // 댓글 렌더링
         const commentList = document.getElementById("comment-list");
         commentList.innerHTML = "";
+
         if (!post.comments || post.comments.length === 0) {
             commentList.textContent = "댓글이 없습니다.";
         } else {
@@ -89,8 +117,20 @@
                 content.className = "comment-content";
                 content.textContent = c.content || "";
 
+                const likeBtn = document.createElement("button");
+                likeBtn.textContent = c.like ? "❤️ 좋아요 완료" : "❤️ 좋아요";
+
+                const likeCountSpan = document.createElement("span");
+                likeCountSpan.textContent = c.likeCount ?? 0;
+                likeCountSpan.style.marginLeft = "5px";
+
+                likeBtn.addEventListener("click", () => likeComment(c.commentId, likeBtn, likeCountSpan));
+
                 div.appendChild(author);
                 div.appendChild(content);
+                div.appendChild(likeBtn);
+                div.appendChild(likeCountSpan);
+
                 commentList.appendChild(div);
             });
         }

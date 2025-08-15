@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -27,17 +29,17 @@ public class Post extends BaseEntity {
 
     private Integer viewCount;
 
-    private Integer likeCount;
-
     @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post")
+    private Set<PostLike> postLikes = new HashSet<>();
 
     protected Post(User author, String title, String content) {
         this.author = author;
         this.title = title;
         this.content = content;
         this.viewCount = 0;
-        this.likeCount = 0;
     }
 
     //<-- 생성 메서드 -->
@@ -45,5 +47,10 @@ public class Post extends BaseEntity {
         Post post = new Post(author, title, content);
         author.addPost(post);
         return post;
+    }
+
+    //<--편의 메서드-->
+    public void addViewCount(){
+        this.viewCount++;
     }
 }

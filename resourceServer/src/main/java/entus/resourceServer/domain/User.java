@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -24,6 +26,12 @@ public class User extends BaseEntity{
 
     @OneToMany(mappedBy = "author")
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private Set<PostLike> postLikes = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private Set<CommentLike> commentLikes = new HashSet<>();
 
     protected User(Long id) {
         this.id = id;

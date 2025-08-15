@@ -5,6 +5,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -16,7 +19,6 @@ public class Comment extends BaseEntity {
 
     private String content;
 
-    private Integer likeCount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -26,11 +28,13 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
+    @OneToMany(mappedBy = "comment")
+    private Set<CommentLike> commentLikes = new HashSet<>();
+
     protected Comment(String content, User author, Post post) {
         this.content = content;
         this.author = author;
         this.post = post;
-        this.likeCount = 0;
     }
 
     //<-- 생성 메서드 -->

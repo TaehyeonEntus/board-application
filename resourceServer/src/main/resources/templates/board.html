@@ -2,100 +2,182 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>게시판</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Server - 게시판</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-        th { background-color: #f2f2f2; }
-        .write-button { margin-top: 20px; }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+        }
+        .container-main {
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+        .card {
+            background: rgba(255,255,255,0.95);
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .card-header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 20px 20px 0 0 !important;
+            border: none;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+        .post-btn {
+            margin-bottom: 1rem;
+        }
+        .post-card {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            background: #fff;
+        }
+        .post-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102,126,234,0.2);
+        }
+        .hot-post {
+            border-left: 4px solid #ff6b6b;
+            padding-left: 1rem;
+        }
+        .pagination {
+            justify-content: center;
+        }
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
     </style>
 </head>
 <body>
 
-<h1>게시판</h1>
+<div class="container container-main">
 
-<!-- 🔥 인기 게시글 TOP 5 -->
-<h2>🔥 인기 게시글 TOP 5</h2>
-<ul id="hotPosts"></ul>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white">게시판</h2>
+        <a href="/post/add" class="btn btn-primary post-btn"><i class="fas fa-plus me-2"></i>게시글 작성</a>
+    </div>
 
-<hr>
+    <div class="card">
+        <div class="card-header">
+            🔥 핫 게시글
+        </div>
+        <div class="card-body" id="hotPostsContainer">
+            <div class="loading-spinner" id="hotLoading">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 text-muted">불러오는 중...</p>
+            </div>
+        </div>
+    </div>
 
-<!-- 📃 게시글 목록 -->
-<table>
-    <thead>
-    <tr>
-        <th>번호</th>
-        <th>제목</th>
-        <th>작성자</th>
-        <th>작성일</th>
-        <th>조회수</th>
-    </tr>
-    </thead>
-    <tbody id="posts"></tbody>
-</table>
+    <div class="card">
+        <div class="card-header">
+            📝 최신 게시글
+        </div>
+        <div class="card-body" id="postsContainer">
+            <div class="loading-spinner" id="postsLoading">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 text-muted">불러오는 중...</p>
+            </div>
+        </div>
+        <nav>
+            <ul class="pagination" id="paginationContainer"></ul>
+        </nav>
+    </div>
+</div>
 
+<script src="/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 <script type="module">
-    import { loadProtectedData } from "/js/apiRequest.js";
+    import { getData } from '/js/api.js';
 
-    window.addEventListener("DOMContentLoaded", async () => {
-        const data = await loadProtectedData("/api/board");
+    let currentPage = 0;
+    const hotPostsContainer = document.getElementById('hotPostsContainer');
+    const postsContainer = document.getElementById('postsContainer');
+    const hotLoading = document.getElementById('hotLoading');
+    const postsLoading = document.getElementById('postsLoading');
+    const paginationContainer = document.getElementById('paginationContainer');
 
-        if (!data) {
-            console.error("게시판 데이터를 불러오지 못했습니다.");
-            return;
+    async function loadBoard(page = 0) {
+        // 로딩 스피너 표시
+        hotLoading.style.display = 'block';
+        postsLoading.style.display = 'block';
+
+        // 이전 내용 초기화
+        hotPostsContainer.innerHTML = '';
+        postsContainer.innerHTML = '';
+        paginationContainer.innerHTML = '';
+
+        try {
+            const data = await getData(`/api/board?page=${page}`);
+
+            // 핫 게시글
+            if (data.hotPosts.length > 0) {
+                data.hotPosts.forEach(post => {
+                    const div = document.createElement('div');
+                    div.className = 'post-card hot-post';
+                    div.innerHTML = `<strong>${post.title}</strong> <span class="text-muted">by ${post.authorName}</span>`;
+                    div.addEventListener('click', () => window.location.href = `/board/${post.postId}`);
+                    hotPostsContainer.appendChild(div);
+                });
+            } else {
+                hotPostsContainer.innerHTML = '<p class="text-muted">핫 게시글이 없습니다.</p>';
+            }
+
+            // 일반 게시글
+            if (data.posts.length > 0) {
+                data.posts.forEach(post => {
+                    const div = document.createElement('div');
+                    div.className = 'post-card';
+                    div.innerHTML = `<strong>${post.title}</strong> <span class="text-muted">by ${post.authorName}</span>`;
+                    div.addEventListener('click', () => window.location.href = `/board/${post.postId}`);
+                    postsContainer.appendChild(div);
+                });
+            } else {
+                postsContainer.innerHTML = '<p class="text-muted">게시글이 없습니다.</p>';
+            }
+
+            // 페이지네이션
+            for (let i = 0; i < data.totalPage; i++) {
+                const li = document.createElement('li');
+                li.className = 'page-item' + (i === data.currentPage ? ' active' : '');
+                li.innerHTML = `<a class="page-link" href="#">${i + 1}</a>`;
+                li.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    currentPage = i;
+                    loadBoard(i);
+                });
+                paginationContainer.appendChild(li);
+            }
+
+        } catch (err) {
+            console.error(err);
+            hotPostsContainer.innerHTML = '<p class="text-danger">핫 게시글 로딩 실패</p>';
+            postsContainer.innerHTML = '<p class="text-danger">게시글 로딩 실패</p>';
+        } finally {
+            // 로딩 스피너 숨기기
+            hotLoading.style.display = 'none';
+            postsLoading.style.display = 'none';
         }
-
-        renderHotPosts(data.hotPosts || []);
-        renderPosts(data.posts || []);
-    });
-
-    /** 🔹 인기글 렌더링 */
-    function renderHotPosts(hotPosts) {
-        const ul = document.getElementById("hotPosts");
-        ul.innerHTML = "";
-
-        hotPosts.forEach(post => {
-            const li = document.createElement("li");
-            const a = document.createElement("a");
-            a.href = `/board/${post.postId}`;
-            a.textContent = `${post.title} (조회수: ${post.viewCount})`;
-            li.appendChild(a);
-            ul.appendChild(li);
-        });
     }
 
-    /** 🔹 게시글 목록 렌더링 */
-    function renderPosts(posts) {
-        const tbody = document.getElementById("posts");
-        tbody.innerHTML = "";
-
-        posts.forEach(post => {
-            const created = post.createdAt
-                ? new Date(post.createdAt).toLocaleDateString()
-                : "-";
-
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                    <td>${post.postId}</td>
-                    <td><a href="/board/${post.postId}">${escapeHtml(post.title)}</a></td>
-                    <td>${escapeHtml(post.authorName || "-")}</td>
-                    <td>${created}</td>
-                    <td>${post.viewCount ?? 0}</td>
-                `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    /** 🔹 XSS 방지용 HTML 이스케이프 */
-    function escapeHtml(text) {
-        if (!text) return "";
-        return text
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
+    // 초기 로딩
+    loadBoard();
 </script>
 
 </body>

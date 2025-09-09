@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <title>게시글 작성</title>
     <style>
         form {
             width: 600px;
             margin: 0 auto;
         }
+
         label {
             display: block;
             margin-top: 15px;
             font-weight: bold;
         }
+
         input[type="text"], textarea {
             width: 100%;
             padding: 8px;
@@ -20,24 +22,29 @@
             box-sizing: border-box;
             font-size: 16px;
         }
+
         textarea {
             height: 200px;
             resize: vertical;
         }
+
         button {
             margin-top: 20px;
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
         }
+
         .cancel-button {
             margin-left: 10px;
         }
+
         /* 에러 필드 빨간 테두리 */
         .is-invalid {
             border-color: red;
             outline: none;
         }
+
         /* 에러 메시지 스타일 */
         .error {
             color: red;
@@ -51,21 +58,26 @@
 
 <form th:action="@{/board/add}" th:object="${postAddDto}" method="post" novalidate>
     <label for="title">제목</label>
-    <input type="text" id="title" th:field="*{title}" th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''" />
+    <input type="text" id="title" th:field="*{title}"
+           th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''"/>
     <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="error"></div>
 
     <label for="content">내용</label>
-    <textarea id="content" th:field="*{content}" th:classappend="${#fields.hasErrors('content')} ? 'is-invalid' : ''"></textarea>
+    <textarea id="content" th:field="*{content}"
+              th:classappend="${#fields.hasErrors('content')} ? 'is-invalid' : ''"></textarea>
     <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="error"></div>
 
     <button type="submit">작성 완료</button>
-    <a href="/board"><button type="button" class="cancel-button">취소</button></a>
+    <a href="/board">
+        <button type="button" class="cancel-button">취소</button>
+    </a>
 </form>
 
 <script type="module">
-    import { loadProtectedData } from "/js/apiRequest.js";
+    import {fetchData} from "/js/fetchData.js";
+
     window.addEventListener("DOMContentLoaded", () => {
-        loadProtectedData("/api/board/add");
+        fetchData("/api/board/add", "GET", null);
     });
 </script>
 

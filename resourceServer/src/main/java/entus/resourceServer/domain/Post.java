@@ -53,4 +53,12 @@ public class Post extends BaseEntity {
     public void addViewCount(){
         this.viewCount++;
     }
+
+    public int getLikeCount(){
+        return this.postLikes.size();
+    }
+
+    public boolean isLikedBy(Long userId) {
+        return postLikes.stream().anyMatch(pl -> pl.getUser().getId().equals(userId));
+    }
 }

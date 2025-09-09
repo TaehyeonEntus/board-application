@@ -43,4 +43,13 @@ public class Comment extends BaseEntity {
         author.addComment(comment);
         return comment;
     }
+
+    //<-- 편의 메서드 -->
+    public int getLikeCount(){
+        return this.commentLikes.size();
+    }
+
+    public boolean isLikedBy(Long userId) {
+        return commentLikes.stream().anyMatch(pl -> pl.getUser().getId().equals(userId));
+    }
 }

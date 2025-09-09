@@ -23,4 +23,9 @@ public class PostLike {
         this.user = user;
         this.post = post;
     }
+
+    //<-- 생성 메서드 -->
+    public static PostLike createPostLike(User user, Post post) {
+        return new PostLike(user, post);
+    }
 }

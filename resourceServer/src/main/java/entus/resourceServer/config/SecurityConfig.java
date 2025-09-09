@@ -6,7 +6,6 @@ import entus.resourceServer.filter.token.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -29,8 +28,12 @@ public class SecurityConfig {
                 .sessionManagement((configurer) -> configurer
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/public", "/", "/board", "/board/**", "/error","/favicon.ico","/js/**","/addTestData").permitAll()
-                        .requestMatchers("/user", "/api/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/**").authenticated()
+                        .requestMatchers("/js/**", "/css/**", "/images/**", "/favicon.ico").permitAll()
+                        .requestMatchers("/", "/board", "/board/**", "/post", "/post/**", "/comment", "/comment/**").permitAll()
+                        .requestMatchers("/addTestData").permitAll()
+                        .requestMatchers("/public").permitAll()
+                        .requestMatchers("/user").hasRole("USER")
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class)

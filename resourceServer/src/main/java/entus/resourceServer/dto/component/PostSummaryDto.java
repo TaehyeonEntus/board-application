@@ -1,4 +1,4 @@
-package entus.resourceServer.domain.dto;
+package entus.resourceServer.dto.component;
 
 import entus.resourceServer.domain.Post;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class PostListDto {
+public class PostSummaryDto {
     private Long postId;
 
     private String authorName;
@@ -19,7 +19,7 @@ public class PostListDto {
 
     private LocalDateTime createdAt;
 
-    public PostListDto(Post post) {
+    public PostSummaryDto(Post post) {
         this.postId = post.getId();
         this.authorName = post.getAuthor().getName();
         this.title = post.getTitle();

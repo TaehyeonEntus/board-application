@@ -1,10 +1,10 @@
-package entus.resourceServer.domain.dto;
+package entus.resourceServer.dto.component;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class PostAddDto {
+public class PostAddRequestDto {
     @NotBlank
     private String title;
     @NotBlank

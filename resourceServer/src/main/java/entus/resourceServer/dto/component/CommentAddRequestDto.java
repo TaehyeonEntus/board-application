@@ -1,10 +1,11 @@
-package entus.resourceServer.domain.dto;
+package entus.resourceServer.dto.component;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class CommentAddDto {
+public class CommentAddRequestDto {
+    private Long postId;
     @NotBlank
     private String comment;
 }

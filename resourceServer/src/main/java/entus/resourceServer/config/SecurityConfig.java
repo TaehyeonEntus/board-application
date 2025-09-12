@@ -4,6 +4,7 @@ import entus.resourceServer.exception.CustomAccessDeniedHandler;
 import entus.resourceServer.exception.CustomAuthenticationEntryPoint;
 import entus.resourceServer.filter.token.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,8 +29,9 @@ public class SecurityConfig {
                 .sessionManagement((configurer) -> configurer
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/api/**").authenticated()
+                        .requestMatchers(EndpointRequest.to("prometheus")).permitAll()
                         .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/api/**").authenticated()
                         .requestMatchers("/js/**", "/css/**", "/images/**", "/favicon.ico").permitAll()
                         .requestMatchers("/", "/board", "/board/**", "/post", "/post/**", "/comment", "/comment/**").permitAll()
                         .requestMatchers("/addTestData").permitAll()

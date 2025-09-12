@@ -21,7 +21,7 @@ export async function postData(endpoint, data) {
 }
 
 async function sendRequest(endpoint, options) {
-    let AUTH_SERVER_URL = "http://localhost:9000"
+    let AUTH_SERVER_URL = "https://auth.taehyeon-studio.site"
     let res = await fetch(endpoint, options);
 
     // access 만료 시 refresh

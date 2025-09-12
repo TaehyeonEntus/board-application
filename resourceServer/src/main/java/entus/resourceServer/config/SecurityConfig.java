@@ -29,11 +29,12 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/api/**").authenticated()
+                        .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/js/**", "/css/**", "/images/**", "/favicon.ico").permitAll()
                         .requestMatchers("/", "/board", "/board/**", "/post", "/post/**", "/comment", "/comment/**").permitAll()
                         .requestMatchers("/addTestData").permitAll()
                         .requestMatchers("/public").permitAll()
-                        .requestMatchers("/user").hasRole("USER")
+                        .requestMatchers("/user").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class)

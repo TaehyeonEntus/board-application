@@ -1,6 +1,6 @@
 package entus.resourceServer.dto.page;
 
-import entus.resourceServer.dto.component.PostSummaryDto;
+import entus.resourceServer.dto.response.PostSummaryDto;
 import lombok.Data;
 import java.util.List;
 

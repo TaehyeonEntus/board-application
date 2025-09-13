@@ -2,9 +2,9 @@ package entus.resourceServer.controller;
 
 import entus.resourceServer.domain.Comment;
 import entus.resourceServer.domain.Post;
-import entus.resourceServer.dto.component.CommentDto;
-import entus.resourceServer.dto.component.PostDto;
-import entus.resourceServer.dto.component.PostSummaryDto;
+import entus.resourceServer.dto.response.CommentDetailDto;
+import entus.resourceServer.dto.response.PostDetailDto;
+import entus.resourceServer.dto.response.PostSummaryDto;
 import entus.resourceServer.dto.page.BoardPageDto;
 import entus.resourceServer.dto.page.CommentPageDto;
 import entus.resourceServer.dto.page.PostPageDto;
@@ -57,22 +57,22 @@ public class ApiController {
         }
         Page<Comment> comments = commentService.getCommentsByPost(post, PageRequest.of(0, 10, Sort.by("id").descending()));
 
-        PostDto postDto = new PostDto(post, post.isLikedBy(userId));
-        List<CommentDto> commentsDto = comments
+        PostDetailDto postDetailDto = new PostDetailDto(post, post.isLikedBy(userId));
+        List<CommentDetailDto> commentsDto = comments
                         .stream()
-                        .map(comment -> new CommentDto(comment, comment.isLikedBy(userId)))
+                        .map(comment -> new CommentDetailDto(comment, comment.isLikedBy(userId)))
                         .toList();
 
-        return ResponseEntity.ok().body(new PostPageDto(postDto, commentsDto, 0, comments.getTotalPages()));
+        return ResponseEntity.ok().body(new PostPageDto(postDetailDto, commentsDto, 0, comments.getTotalPages()));
     }
 
     //Post만
     @GetMapping("/board/{postId}/post")
-    public PostDto apiPost(@PathVariable Long postId, Principal principal) {
+    public PostDetailDto apiPost(@PathVariable Long postId, Principal principal) {
         Long userId = Long.parseLong(principal.getName());
         Post post = postService.get(postId);
 
-        return new PostDto(post, post.isLikedBy(userId));
+        return new PostDetailDto(post, post.isLikedBy(userId));
     }
 
     //Comments만
@@ -83,8 +83,8 @@ public class ApiController {
         Page<Comment> comments = commentService.getCommentsByPost(post, PageRequest.of(page, 10, Sort.by("id").descending()));
 
 
-        List<CommentDto> commentsDto = comments.stream()
-                .map(comment -> new CommentDto(comment, comment.isLikedBy(userId)))
+        List<CommentDetailDto> commentsDto = comments.stream()
+                .map(comment -> new CommentDetailDto(comment, comment.isLikedBy(userId)))
                 .toList();
 
         return ResponseEntity.ok().body(new CommentPageDto(commentsDto,page,comments.getTotalPages()));

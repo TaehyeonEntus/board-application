@@ -3,8 +3,8 @@ package entus.resourceServer.controller;
 import entus.resourceServer.domain.Comment;
 import entus.resourceServer.domain.Post;
 import entus.resourceServer.domain.User;
-import entus.resourceServer.dto.component.CommentAddRequestDto;
-import entus.resourceServer.dto.component.CommentDto;
+import entus.resourceServer.dto.request.CommentAddRequestDto;
+import entus.resourceServer.dto.response.CommentDetailDto;
 import entus.resourceServer.dto.page.CommentPageDto;
 import entus.resourceServer.service.CommentService;
 import entus.resourceServer.service.PostService;
@@ -54,8 +54,8 @@ public class CommentController {
 
         Page<Comment> comments = commentService.getCommentsByPost(post, PageRequest.of(0, 10, Sort.by("id").descending()));
 
-        List<CommentDto> commentsDto = comments.stream()
-                .map(comment -> new CommentDto(comment, comment.isLikedBy(userId)))
+        List<CommentDetailDto> commentsDto = comments.stream()
+                .map(comment -> new CommentDetailDto(comment, comment.isLikedBy(userId)))
                 .toList();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new CommentPageDto(commentsDto,0,comments.getTotalPages()));

@@ -1,4 +1,4 @@
-package entus.resourceServer.dto.component;
+package entus.resourceServer.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

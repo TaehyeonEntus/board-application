@@ -13,7 +13,7 @@ public class PageController {
 
     @GetMapping("/board")
     public String board() {
-        return "board";
+        return "home";
     }
 
     @GetMapping("/board/{postId}")

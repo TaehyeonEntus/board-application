@@ -2,7 +2,7 @@ package entus.resourceServer.controller;
 
 import entus.resourceServer.domain.Post;
 import entus.resourceServer.domain.User;
-import entus.resourceServer.dto.component.PostAddRequestDto;
+import entus.resourceServer.dto.request.PostAddRequestDto;
 import entus.resourceServer.service.PostService;
 import entus.resourceServer.service.UserService;
 import jakarta.validation.Valid;

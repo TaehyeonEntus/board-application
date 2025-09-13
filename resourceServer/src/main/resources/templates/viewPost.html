@@ -127,7 +127,7 @@
         loadPost = async () => {
             try {
                 this.postDataObj = await getData(`/api/board/${this.postId}`);
-                this.updatePostUI(this.postDataObj.postDto, this.postDataObj.commentDto);
+                this.updatePostUI(this.postDataObj.postDetailDto, this.postDataObj.commentDetailDto);
 
                 this.totalPages = this.postDataObj.totalPage;
                 this.currentPage = this.postDataObj.currentPage;
@@ -156,13 +156,13 @@
             }
         }
 
-        updatePostUI = (postDto, commentDto) => {
-            this.titleEl.textContent = postDto.title;
-            this.authorEl.textContent = `작성자: ${postDto.authorName}`;
-            this.contentEl.textContent = postDto.content;
-            this.viewCountEl.textContent = `조회수: ${postDto.viewCount}`;
-            this.updateLikeBtn(postDto.like, postDto.likeCount);
-            this.renderComments(commentDto, true);
+        updatePostUI = (postDetailDto, commentDetailDto) => {
+            this.titleEl.textContent = postDetailDto.title;
+            this.authorEl.textContent = `작성자: ${postDetailDto.authorName}`;
+            this.contentEl.textContent = postDetailDto.content;
+            this.viewCountEl.textContent = `조회수: ${postDetailDto.viewCount}`;
+            this.updateLikeBtn(postDetailDto.like, postDetailDto.likeCount);
+            this.renderComments(commentDetailDto, true);
         }
 
         updateLikeBtn = (liked, count) => {
@@ -201,7 +201,7 @@
             this.currentPage++;
             try {
                 const commentsPage = await getData(`/api/board/${this.postId}/comment?page=${this.currentPage}`);
-                this.renderComments(commentsPage.commentDto, false);
+                this.renderComments(commentsPage.commentDetailDto, false);
                 this.totalPages = commentsPage.totalPages;
                 this.updateLoadMoreBtn();
             } catch (err) {
@@ -214,7 +214,7 @@
         handlePostLike = async () => {
             try {
                 await postData(`/post/like/${this.postId}`, {});
-                const post = this.postDataObj.postDto;
+                const post = this.postDataObj.postDetailDto;
                 post.like = !post.like;
                 post.likeCount += post.like ? 1 : -1;
                 this.updateLikeBtn(post.like, post.likeCount);
@@ -252,7 +252,7 @@
                 this.commentInput.value = "";
                 this.currentPage = 0;
                 const commentsPage = await getData(`/api/board/${this.postId}/comment?page=${this.currentPage}`);
-                this.renderComments(commentsPage.commentDto, true);
+                this.renderComments(commentsPage.commentDetailDto, true);
                 this.totalPages = commentsPage.totalPages;
                 this.updateLoadMoreBtn();
             } catch (err) {

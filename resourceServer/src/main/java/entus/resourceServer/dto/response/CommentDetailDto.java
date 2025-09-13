@@ -1,10 +1,10 @@
-package entus.resourceServer.dto.component;
+package entus.resourceServer.dto.response;
 
 import entus.resourceServer.domain.Comment;
 import lombok.Data;
 
 @Data
-public class CommentDto {
+public class CommentDetailDto {
     private Long commentId;
 
     private String authorName;
@@ -13,7 +13,7 @@ public class CommentDto {
     private Integer likeCount;
     private boolean like;
 
-    public CommentDto(Comment comment, boolean like) {
+    public CommentDetailDto(Comment comment, boolean like) {
         this.commentId = comment.getId();
         this.authorName = comment.getAuthor().getName();
         this.content = comment.getContent();
